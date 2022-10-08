@@ -2,7 +2,6 @@
 
 using namespace std; 
 
-
 class Node {
 
 private:
@@ -23,20 +22,20 @@ public:  // Constructors
 		value = v;
 		NextNode = newNextNode;
 	}
-
+	friend class Test;
 };
 
-typedef Node* NodeFirst; //Alias
+typedef Node* PointerNode; //Alias
 
 class List {
 
 private:
-	NodeFirst head;
-	NodeFirst current;
+	PointerNode head;
+	PointerNode current;
 
 public:
 	List() { head = NULL; current = NULL; }
-	~List();
+	//~List();
 
 	void unshift(int v); // Insert at Beginning
 	void push(int v); // Insert at End
@@ -46,21 +45,19 @@ public:
 	void next();
 	void first();
 	void last();
-	void pop();
+	Node* pop();
 	void shift();
-	void removeAtIndex(int pos); 
+	void removeAtIndex(int pos);
+	Node* getElementByIndex(int index);
 	int length();
-	void UNO(List * LBuscar, List* LTrabajo);
-	void DOS();
-	void TRES();
-	void CUATRO();
+	bool searchElement(int element);
+
+	friend class Test;
 };
-
-
-
+/*
 List::~List()
 {
-	NodeFirst aux;
+	PointerNode aux;
 
 	while (head) {
 		aux = head;
@@ -70,11 +67,11 @@ List::~List()
 
 	head = NULL;
 }
-
+*/
 int List::length() {
 	int cont = 0;
 
-	NodeFirst aux = head;
+	PointerNode aux = head;
 	if (isEmpty()) {
 		return cont;
 	}
@@ -108,7 +105,7 @@ void List::push(int v)
 	}
 	else
 	{
-		NodeFirst aux = head;
+		PointerNode aux = head;
 
 		while (aux->NextNode != NULL) {
 			aux = aux->NextNode;
@@ -134,37 +131,37 @@ void List::splice(int v, int pos)
 				i++;
 				aux = aux->NextNode;
 			}
-			NodeFirst newNodeFirst = new Node(v);
+			PointerNode newNodeFirst = new Node(v);
 			newNodeFirst->NextNode = aux->NextNode;
 			aux->NextNode = newNodeFirst;
 		}
 	}
 }
 
-void List::pop()
+Node* List::pop()
 {
 	if (isEmpty()) {
-		cout << "Empty List:" << endl;
+		return NULL;
 	}
 	else {
 
 		if (head->NextNode == NULL)
 		{
-			NodeFirst temp = head;
+			PointerNode temp = head;
 			head = NULL;
-			delete temp;
+			return temp;
 		}
 		else {
 
-			NodeFirst aux = head;
+			PointerNode aux = head;
 			while (aux->NextNode->NextNode != NULL) {
 				aux = aux->NextNode;
 			}
 
-			NodeFirst temp = aux->NextNode;
+			PointerNode temp = aux->NextNode;
 			aux->NextNode = NULL;
 
-			delete temp;
+			return temp;
 		}
 	}
 }
@@ -177,13 +174,13 @@ void List::shift()
 	else {
 		if (head->NextNode == NULL)
 		{
-			NodeFirst temp = head;
+			PointerNode temp = head;
 			head = NULL;
 			delete temp;
 		}
 		else
 		{
-			NodeFirst aux = head;
+			PointerNode aux = head;
 			head = head->NextNode;
 			delete aux;
 		}
@@ -201,18 +198,18 @@ void List::removeAtIndex(int index) {
 		else {
 			if (index == 1)
 			{
-				NodeFirst temp = head;
+				PointerNode temp = head;
 				head = head->NextNode;
 				delete temp;
 			}
 			else {
 				int cont = 2;
-				NodeFirst aux = head;
+				PointerNode aux = head;
 				while (cont < index) {
 					aux = aux->NextNode;
 					cont++;
 				}
-				NodeFirst temp = aux->NextNode;
+				PointerNode temp = aux->NextNode;
 				aux->NextNode = aux->NextNode->NextNode;
 				delete temp;
 			}
@@ -224,42 +221,26 @@ void List::display()
 {
 	Node* aux;
 	if (head == NULL) {
-		cout << "Empty Here";
+		cout << "Empty List";
 	}
 	else
 	{
 		aux = head;
 		while (aux)
 		{
-			cout << aux->value << "-> ";
+			if (aux->NextNode == NULL)
+			{
+				cout << aux->value;
+			}
+			else {
+				cout << aux->value << ", ";
+			}
+
 			aux = aux->NextNode;
 		}
 		cout << endl;
 	}
 }
-
-//Exercise 1
-void List::UNO(List * LBuscar, List* LTrabajo)
-{
-	
-};
-
-//Exercise 2
-void List::DOS()
-{
-	
-};
-
-//Exercise 3
-void List::TRES() {
-	
-};
-
-//Exercise 4
-void List::CUATRO() {
-
-
-};
 
 void List::next()
 {
@@ -278,40 +259,166 @@ void List::last()
 		while (current->NextNode) next();
 }
 
+bool List::searchElement(int element)
+{
+	bool searchElement = false;
+	if (head != NULL) {
+		Node* aux = head;
+		while (aux)
+		{
+			if (aux->value == element)
+			{
+				searchElement = true;
+			}
+			aux = aux->NextNode;
+		}
+	}
+	return searchElement;
+}
+
+Node* List::getElementByIndex(int index) 
+{
+	if (isEmpty()) {
+		return NULL;
+	}
+	else {
+		if ((index > length()) || (index < 0)) {
+			cout << "An Index should be greater than zero" << endl;
+		}
+		else {
+			if (index == 1)
+			{
+				PointerNode temp = head;
+				head = head->NextNode;
+				return temp;
+			}
+			else {
+				int cont = 2;
+				PointerNode aux = head;
+				while (cont < index) {
+					aux = aux->NextNode;
+					cont++;
+				}
+				PointerNode temp = aux->NextNode;
+				aux->NextNode = aux->NextNode->NextNode;
+				return temp;
+			}
+		}
+	}
+}
+
+class Test {
+private:
+
+public:
+	Test(){ }
+	void UNO(List* LBuscar, List* LTrabajo);
+	void DOS();
+	void TRES();
+	void CUATRO();
+};
+
+//Exercise 1
+void Test::UNO(List* LBuscar, List* LTrabajo)
+{
+	if (LBuscar->isEmpty() && LTrabajo->isEmpty())
+	{
+		cout << "Ambas Listas Estan Vacias" << endl;
+	}
+	else if (LBuscar->isEmpty() && !LTrabajo->isEmpty()) {
+		LTrabajo->display();
+	}
+	else if (!LBuscar->isEmpty() && LTrabajo->isEmpty()) {
+		cout << "Lista de Trabajo Esta Vacia" << endl;
+	}
+	else {
+		List* output = new List();
+		List* temp = LTrabajo;
+
+		while (temp->length() != 0) {
+
+			Node* currentNode = temp->pop();
+			bool lBuscarHasElement = LBuscar->searchElement(currentNode->value);
+			if (lBuscarHasElement)
+			{
+
+				output->unshift(currentNode->value);
+				output->unshift(1);
+				output->unshift(0);
+				output->unshift(1);
+			}
+			else {
+				output->unshift(-1);
+			}
+		}
+		output->display();
+	}
+};
+
+//Exercise 2
+void Test::DOS()
+{
+	
+};
+
+//Exercise 3
+void Test::TRES() {
+	
+};
+
+//Exercise 4
+void Test::CUATRO() {
+
+
+};
+
 int main()
 {
-	List Lista;// Init as NULL
-	
+	//Init Test
+	Test test;
+
 	cout << "***************************************************************************************" << endl;
 	cout << "UNO" << "\n" << endl;
-	
-	
-	Lista.push(10);
-	Lista.push(7);
-	Lista.push(9);
-	Lista.push(20);
+	List* ListaBuscar = new List();// Init as NULL
+	ListaBuscar->push(4);
+	ListaBuscar->push(5);
+	ListaBuscar->push(7);
+	ListaBuscar->push(9);
+	ListaBuscar->push(12);
+	ListaBuscar->push(23);
+	ListaBuscar->push(34);
 
-	Lista.display();
+	List* ListaTrabajo = new List();
+	ListaTrabajo->push(5);
+	ListaTrabajo->push(8);
+	ListaTrabajo->push(9);
+	ListaTrabajo->push(23);
+	ListaTrabajo->push(5);
+	ListaTrabajo->push(7);
+	ListaTrabajo->push(0);
+	ListaTrabajo->push(14);
+
+	test.UNO(ListaBuscar, ListaTrabajo);
 	
 	cout << endl;
 
 	cout << "***************************************************************************************" << endl;
-	Lista.~List();
+	//Lista.~List();
 	cout << "DOS" << "\n" << endl;
 
 	cout << endl;
 	cout << "***************************************************************************************" << endl;
-	Lista.~List();
+	//Lista.~List();
 	cout << "TRES" << "\n" << endl; 
 	
 	cout << endl;
 	cout << "***************************************************************************************" << endl;
-	Lista.~List();
+	//Lista.~List();
     cout << "CUATRO" << "\n" << endl; 
 
 	cout << endl;
 	cout << "***************************************************************************************" << endl;
-	Lista.~List();
+	//Lista.~List();
 	cin.get();
 	return 0;
 }
