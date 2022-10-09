@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <string>
 using namespace std; 
 
 class Node {
@@ -8,7 +8,6 @@ private:
 	int value = 0;
 	string val = "";
 	Node* NextNode;
-	friend class List;
 
 public:  // Constructors
 
@@ -25,15 +24,17 @@ public:  // Constructors
 	}
 	Node(string v)
 	{
-		val = v;
+		this->val = v;
 		NextNode = NULL;
 	}
 
 	Node(string v, Node* newNextNode)
 	{
-		val = v;
+		this->val = v;
 		NextNode = newNextNode;
 	}
+	friend class List;
+
 	friend class Test;
 };
 
@@ -348,31 +349,22 @@ bool List::searchElement(int element)
 
 int List::readElementByIndex(int index)
 {
-	if (isEmpty()) {
-		return NULL;
+	Node* aux;
+	if (head == NULL) {
+		return -1;
 	}
-	else {
-		if ((index > length()) || (index < 0)) {
-			cout << "An Index should be greater than zero" << endl;
-		}
-		else {
-			if (index == 1)
+	else
+	{
+		int count = 0;
+		aux = head;
+		while (aux)
+		{
+			if (count == index)
 			{
-				PointerNode temp = head;
-				head = head->NextNode;
-				return temp->value;
-			}
-			else {
-				int cont = 2;
-				PointerNode aux = head;
-				while (cont < index) {
-					aux = aux->NextNode;
-					cont++;
-				}
-				//PointerNode temp = aux->NextNode;
-				//aux->NextNode = aux->NextNode->NextNode;
 				return aux->value;
 			}
+			count++;
+			aux = aux->NextNode;
 		}
 	}
 }
@@ -450,7 +442,7 @@ void Test::DOS(int num1, int num2)
 		return;
 	}
 
-	if (numL1->length() < 4 || numL2->length() < 4)
+	if (numL1->length() < 2 || numL2->length() < 2)
 	{
 		cout << "Algun numero es menos de 3 digitos y no son validos" << endl;
 		return;
@@ -458,34 +450,50 @@ void Test::DOS(int num1, int num2)
 
 	List* output = new List();
 
-	bool isFromL2 = true;
+	int cont = 0;
 
-	while (numL1->length() != 1 || numL2->length() != 1) {
+	bool isListTwo = true;
 
-		int centerL1 = (numL1->length() / 2) + 1;
+	int length = (numL1->length() - 1);
+	
+	int centerIndexL1 = (numL1->length() / 2) ;
 
-		int centerL2 = (numL2->length() / 2) + 1;
+	int centerIndexL2 = (numL2->length() / 2);
 
-		int left = numL1->readElementByIndex(centerL1 - 1);
+	int leftIndex = centerIndexL1 - 1;
 
-		int right = numL1->readElementByIndex(centerL1 + 1);
+	int rightIndex = centerIndexL1 + 1;
 
-		if (isFromL2 && numL1->length() != 1)
+	bool isSecondList = true;
+	
+	while (cont < length) {
+		if (isSecondList)
 		{
-			output->push(centerL2);
-			output->unshift(" + " + left);
-			output->unshift(" - " + right);
-			isFromL2 = false;
+			output->push(to_string(numL2->readElementByIndex(centerIndexL2)) + " + " +
+				to_string(numL1->readElementByIndex(leftIndex)) + " - " +
+				to_string(numL1->readElementByIndex(rightIndex)) + ", " +
+				to_string(numL2->readElementByIndex(centerIndexL2)) + " + " +
+				to_string(numL1->readElementByIndex(rightIndex)) + " - " +
+				to_string(numL1->readElementByIndex(leftIndex))
+			);
+			isSecondList = false;
 		}
 		else {
-			isFromL2 = true;
-			output->push(centerL1);
-			output->unshift(" + " + left);
-			output->unshift(" - " + right);
+			output->push(to_string(numL1->readElementByIndex(centerIndexL1)) + " + " +
+				to_string(numL2->readElementByIndex(rightIndex)) + " - " +
+				to_string(numL2->readElementByIndex(leftIndex)) + ", " +
+				to_string(numL1->readElementByIndex(centerIndexL2)) + " + " +
+				to_string(numL2->readElementByIndex(leftIndex)) + " - " +
+				to_string(numL2->readElementByIndex(rightIndex))
+			);
+			isSecondList = true;
+			leftIndex--;
+			rightIndex++;
 		}
+		cont++;
 	}
+
 	output->displayVal();
-	//cout << "Is Reached" << endl;
 
 };
 
