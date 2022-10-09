@@ -6,6 +6,7 @@ class Node {
 
 private:
 	int value = 0;
+	string val = "";
 	Node* NextNode;
 	friend class List;
 
@@ -22,6 +23,17 @@ public:  // Constructors
 		value = v;
 		NextNode = newNextNode;
 	}
+	Node(string v)
+	{
+		val = v;
+		NextNode = NULL;
+	}
+
+	Node(string v, Node* newNextNode)
+	{
+		val = v;
+		NextNode = newNextNode;
+	}
 	friend class Test;
 };
 
@@ -36,38 +48,43 @@ private:
 public:
 	List() { head = NULL; current = NULL; }
 	//~List();
-
+	void unshift(string v); // Insert at Beginning
+	void push(string v); // Insert at End
 	void unshift(int v); // Insert at Beginning
 	void push(int v); // Insert at End
 	void splice(int v, int pos); // Insert at Index Position
 	bool isEmpty() { return head == NULL; }
 	void display();
+	void displayVal();
 	void next();
 	void first();
 	void last();
 	Node* pop();
 	void shift();
 	void removeAtIndex(int pos);
-	Node* getElementByIndex(int index);
 	int length();
 	bool searchElement(int element);
+	List* splitNumbers(int number);
+	int readElementByIndex(int index);
 
 	friend class Test;
 };
-/*
-List::~List()
+
+List* List::splitNumbers(int num)
 {
-	PointerNode aux;
-
-	while (head) {
-		aux = head;
-		head = head->NextNode;
-		delete aux;
+	List* result = new List();
+	if (num > 0)
+	{
+		while (num != 0)
+		{
+			int temp = num % 10;
+			result->unshift(temp);
+			num = num / 10;
+		}
 	}
-
-	head = NULL;
+	return result;
 }
-*/
+
 int List::length() {
 	int cont = 0;
 
@@ -86,6 +103,18 @@ int List::length() {
 
 }
 
+void List::unshift(string v)
+{
+	if (isEmpty())
+	{
+		head = new Node(v);
+	}
+	else
+	{
+		head = new Node(v, head);
+	}
+}
+
 void List::unshift(int v)
 {
 	if (isEmpty())
@@ -95,6 +124,22 @@ void List::unshift(int v)
 	else
 	{
 		head = new Node(v, head);
+	}
+}
+
+void List::push(string v)
+{
+	if (isEmpty()) {
+		head = new Node(v);
+	}
+	else
+	{
+		PointerNode aux = head;
+
+		while (aux->NextNode != NULL) {
+			aux = aux->NextNode;
+		}
+		aux->NextNode = new Node(v);
 	}
 }
 
@@ -242,6 +287,31 @@ void List::display()
 	}
 }
 
+void List::displayVal()
+{
+	Node* aux;
+	if (head == NULL) {
+		cout << "Empty List";
+	}
+	else
+	{
+		aux = head;
+		while (aux)
+		{
+			if (aux->NextNode == NULL)
+			{
+				cout << aux->val;
+			}
+			else {
+				cout << aux->val << ", ";
+			}
+
+			aux = aux->NextNode;
+		}
+		cout << endl;
+	}
+}
+
 void List::next()
 {
 	if (current) current = current->NextNode;
@@ -276,7 +346,7 @@ bool List::searchElement(int element)
 	return searchElement;
 }
 
-Node* List::getElementByIndex(int index) 
+int List::readElementByIndex(int index)
 {
 	if (isEmpty()) {
 		return NULL;
@@ -290,7 +360,7 @@ Node* List::getElementByIndex(int index)
 			{
 				PointerNode temp = head;
 				head = head->NextNode;
-				return temp;
+				return temp->value;
 			}
 			else {
 				int cont = 2;
@@ -299,9 +369,9 @@ Node* List::getElementByIndex(int index)
 					aux = aux->NextNode;
 					cont++;
 				}
-				PointerNode temp = aux->NextNode;
-				aux->NextNode = aux->NextNode->NextNode;
-				return temp;
+				//PointerNode temp = aux->NextNode;
+				//aux->NextNode = aux->NextNode->NextNode;
+				return aux->value;
 			}
 		}
 	}
@@ -313,7 +383,7 @@ private:
 public:
 	Test(){ }
 	void UNO(List* LBuscar, List* LTrabajo);
-	void DOS();
+	void DOS(int num1, int num2);
 	void TRES();
 	void CUATRO();
 };
@@ -356,9 +426,67 @@ void Test::UNO(List* LBuscar, List* LTrabajo)
 };
 
 //Exercise 2
-void Test::DOS()
+void Test::DOS(int num1, int num2)
 {
-	
+	if (num1 <= 0 || num2 <= 0)
+	{
+		cout << "Ambos Numeros tienen que ser positivos" << endl;
+		return;
+	}
+
+	List* numL1 = (new List())->splitNumbers(num1);
+
+	List* numL2 = (new List())->splitNumbers(num2);
+
+	if (numL1->length() % 2 == 0 || numL2->length() % 2 == 0)
+	{
+		cout << "Ambos Numeros no son impares y no son validos" << endl;
+		return;
+	}
+
+	if (numL1->length() != numL2->length())
+	{
+		cout << "Ambos Numeros no son del mismo largo y no son validos" << endl;
+		return;
+	}
+
+	if (numL1->length() < 4 || numL2->length() < 4)
+	{
+		cout << "Algun numero es menos de 3 digitos y no son validos" << endl;
+		return;
+	}
+
+	List* output = new List();
+
+	bool isFromL2 = true;
+
+	while (numL1->length() != 1 || numL2->length() != 1) {
+
+		int centerL1 = (numL1->length() / 2) + 1;
+
+		int centerL2 = (numL2->length() / 2) + 1;
+
+		int left = numL1->readElementByIndex(centerL1 - 1);
+
+		int right = numL1->readElementByIndex(centerL1 + 1);
+
+		if (isFromL2 && numL1->length() != 1)
+		{
+			output->push(centerL2);
+			output->unshift(" + " + left);
+			output->unshift(" - " + right);
+			isFromL2 = false;
+		}
+		else {
+			isFromL2 = true;
+			output->push(centerL1);
+			output->unshift(" + " + left);
+			output->unshift(" - " + right);
+		}
+	}
+	output->displayVal();
+	//cout << "Is Reached" << endl;
+
 };
 
 //Exercise 3
@@ -403,9 +531,8 @@ int main()
 	cout << endl;
 
 	cout << "***************************************************************************************" << endl;
-	//Lista.~List();
 	cout << "DOS" << "\n" << endl;
-
+	test.DOS(65234, 89107);
 	cout << endl;
 	cout << "***************************************************************************************" << endl;
 	//Lista.~List();
