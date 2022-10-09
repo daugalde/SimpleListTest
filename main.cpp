@@ -44,10 +44,9 @@ class List {
 
 private:
 	PointerNode head;
-	PointerNode current;
 
 public:
-	List() { head = NULL; current = NULL; }
+	List() { head = NULL; }
 	//~List();
 	void unshift(string v); // Insert at Beginning
 	void push(string v); // Insert at End
@@ -57,9 +56,6 @@ public:
 	bool isEmpty() { return head == NULL; }
 	void display();
 	void displayVal();
-	void next();
-	void first();
-	void last();
 	Node* pop();
 	void shift();
 	void removeAtIndex(int pos);
@@ -304,30 +300,13 @@ void List::displayVal()
 				cout << aux->val;
 			}
 			else {
-				cout << aux->val << ", ";
+				cout << "\n" << aux->val << ", ";
 			}
 
 			aux = aux->NextNode;
 		}
 		cout << endl;
 	}
-}
-
-void List::next()
-{
-	if (current) current = current->NextNode;
-}
-
-void List::first()
-{
-	current = head;
-}
-
-void List::last()
-{
-	current = head;
-	if (!isEmpty())
-		while (current->NextNode) next();
 }
 
 bool List::searchElement(int element)
@@ -366,6 +345,7 @@ int List::readElementByIndex(int index)
 			count++;
 			aux = aux->NextNode;
 		}
+		return -1;
 	}
 }
 
@@ -376,8 +356,8 @@ public:
 	Test(){ }
 	void UNO(List* LBuscar, List* LTrabajo);
 	void DOS(int num1, int num2);
-	void TRES();
-	void CUATRO();
+	void TRES(List* lista);
+	void CUATRO(List* numL1, List* numL2);
 };
 
 //Exercise 1
@@ -469,23 +449,19 @@ void Test::DOS(int num1, int num2)
 	while (cont < length) {
 		if (isSecondList)
 		{
-			output->push(to_string(numL2->readElementByIndex(centerIndexL2)) + " + " +
-				to_string(numL1->readElementByIndex(leftIndex)) + " - " +
-				to_string(numL1->readElementByIndex(rightIndex)) + ", " +
-				to_string(numL2->readElementByIndex(centerIndexL2)) + " + " +
-				to_string(numL1->readElementByIndex(rightIndex)) + " - " +
-				to_string(numL1->readElementByIndex(leftIndex))
-			);
+			output->push(numL2->readElementByIndex(centerIndexL2) +
+				numL1->readElementByIndex(leftIndex) -
+				numL1->readElementByIndex(rightIndex));
+			output->push(numL2->readElementByIndex(centerIndexL2) + numL1->readElementByIndex(rightIndex) - numL1->readElementByIndex(leftIndex));
 			isSecondList = false;
 		}
 		else {
-			output->push(to_string(numL1->readElementByIndex(centerIndexL1)) + " + " +
-				to_string(numL2->readElementByIndex(rightIndex)) + " - " +
-				to_string(numL2->readElementByIndex(leftIndex)) + ", " +
-				to_string(numL1->readElementByIndex(centerIndexL2)) + " + " +
-				to_string(numL2->readElementByIndex(leftIndex)) + " - " +
-				to_string(numL2->readElementByIndex(rightIndex))
-			);
+			output->push(numL1->readElementByIndex(centerIndexL1) +
+				numL2->readElementByIndex(rightIndex) -
+				numL2->readElementByIndex(leftIndex));
+			output->push(numL1->readElementByIndex(centerIndexL2) +
+				numL2->readElementByIndex(leftIndex) -
+				numL2->readElementByIndex(rightIndex));
 			isSecondList = true;
 			leftIndex--;
 			rightIndex++;
@@ -493,19 +469,104 @@ void Test::DOS(int num1, int num2)
 		cont++;
 	}
 
-	output->displayVal();
+	output->display();
 
 };
 
 //Exercise 3
-void Test::TRES() {
-	
+void Test::TRES(List* lista) {
+	List* output = new List();
+	string sublist = "";
+	if (!lista->isEmpty())
+	{
+		int count = 0;
+		while (count < lista->length())
+		{
+			
+			int element = lista->readElementByIndex(count);
+			int elementAhead = lista->readElementByIndex(count + 1);
+			if (element < 0 && elementAhead > 0)
+			{
+				sublist = to_string(1) + " -> " + to_string(0) + " -> " + sublist + " -> " + to_string(0) + " -> " + to_string(1);
+				output->push(sublist);
+				sublist = "";
+			}
+			else if (element < 0 && elementAhead < 0) {
+				sublist = to_string(1) + " -> " + to_string(0) + " -> " + to_string(0) + " -> " + to_string(1);
+
+				output->push(sublist);
+				sublist = "";
+			}
+			else {
+				sublist = sublist + to_string(element) + " -> ";
+			}
+			count++;
+		}
+	}
+	output->displayVal();
 };
 
 //Exercise 4
-void Test::CUATRO() {
+void Test::CUATRO(List* numL1, List* numL2) {
 
+	if (numL1->length() % 2 == 0 || numL2->length() % 2 == 0)
+	{
+		cout << "Ambos Numeros no son impares y no son validos" << endl;
+		return;
+	}
 
+	if (numL1->length() != numL2->length())
+	{
+		cout << "Ambos Numeros no son del mismo largo y no son validos" << endl;
+		return;
+	}
+
+	if (numL1->length() < 2 || numL2->length() < 2)
+	{
+		cout << "Algun numero es menos de 3 digitos y no son validos" << endl;
+		return;
+	}
+
+	List* output = new List();
+
+	int cont = 0;
+
+	bool isListTwo = true;
+
+	int length = (numL1->length() - 1);
+
+	int centerIndexL1 = (numL1->length() / 2);
+
+	int centerIndexL2 = (numL2->length() / 2);
+
+	int leftIndex = centerIndexL1 - 1;
+
+	int rightIndex = centerIndexL1 + 1;
+
+	bool isSecondList = false;
+
+	while (cont < length) {
+		if (isSecondList)
+		{
+
+			output->push( numL2->readElementByIndex(centerIndexL2) + numL1->readElementByIndex(rightIndex) + numL2->readElementByIndex(centerIndexL2)
+              + numL1->readElementByIndex(leftIndex)
+				  );
+			isSecondList = false;
+		}
+		else {
+
+			output->push(numL1->readElementByIndex(centerIndexL1) + numL2->readElementByIndex(leftIndex) +
+				numL1->readElementByIndex(centerIndexL2) + numL2->readElementByIndex(rightIndex)
+			);
+			isSecondList = true;
+			leftIndex++;
+			rightIndex--;
+		}
+		cont++;
+	}
+
+	output->display();
 };
 
 int main()
@@ -543,14 +604,42 @@ int main()
 	test.DOS(65234, 89107);
 	cout << endl;
 	cout << "***************************************************************************************" << endl;
-	//Lista.~List();
-	cout << "TRES" << "\n" << endl; 
-	
+	cout << "TRES" << "\n" << endl;
+	List* Lista = new List();
+	Lista->push(3);
+	Lista->push(4);
+	Lista->push(5);
+	Lista->push(6);
+	Lista->push(-1);
+	Lista->push(7);
+	Lista->push(8);
+	Lista->push(9);
+	Lista->push(10);
+	Lista->push(-2);
+	Lista->push(5);
+	Lista->push(6);
+	Lista->push(-1);
+	Lista->push(-1);
+	test.TRES(Lista);
 	cout << endl;
 	cout << "***************************************************************************************" << endl;
 	//Lista.~List();
     cout << "CUATRO" << "\n" << endl; 
+	List* ListaCuatro = new List();
+	ListaCuatro->push(12);
+	ListaCuatro->push(1);
+	ListaCuatro->push(5);
+	ListaCuatro->push(6);
+	ListaCuatro->push(3);
+	
+	List* ListaCinco = new List();
+	ListaCinco->push(10);
+	ListaCinco->push(11);
+	ListaCinco->push(4);
+	ListaCinco->push(2);
+	ListaCinco->push(7);
 
+	test.CUATRO(ListaCuatro, ListaCinco);
 	cout << endl;
 	cout << "***************************************************************************************" << endl;
 	//Lista.~List();
